@@ -45,9 +45,8 @@ class Ingredient(models.Model):
     )
     
     class Meta:
-        verbos_name = 'Ингредиент'
-        verbos_name_plural = 'Ингредиенты'
-    
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
     def __str__(self) -> str:
         return f'{self.name}, {self.measurement_unit}'
 
@@ -77,7 +76,7 @@ class Recipe(models.Model):
     
     cooking_time = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1)],
-        verbose_name='Время приготовления (минут)'
+        verbose_name='Время приготовления (мин)'
     )
     
     ingredients = models.ManyToManyField(
@@ -102,9 +101,10 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('-pub_date',)
     
     def __str__(self):
-        return f'{self.author.email}, {self.name}'
+        return f'{self.author.name}, {self.name}'
 
 
 class RecipeIngredient(models.Model):
@@ -126,7 +126,7 @@ class RecipeIngredient(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингредиенты'
+        verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
         constraints = (
             models.UniqueConstraint(
@@ -155,7 +155,7 @@ class RecipeTag(models.Model):
     class Meta:
         verbose_name = 'Тэг',
         verbose_name_plural = 'Тэги',
-        сonstraints = (
+        constraints = (
             models.UniqueConstraint(
                 fields=('tag', 'recipe'),
                 name='unique_tag_for_recipe'
@@ -182,8 +182,8 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Избарнное',
-        verbose_name_plural = 'Избранные',
+        verbose_name = 'Избарнный рецепт',
+        verbose_name_plural = 'Избранные рецепты',
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
@@ -210,8 +210,9 @@ class ShoppingList(models.Model):
     )
 
     class Meta:
-        verbose_name = 'список покупок'
-        verbose_name_plural = 'списки покупок'
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'
+        ordering = ['-id']
 
         constraints = (
             models.UniqueConstraint(
