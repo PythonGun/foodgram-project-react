@@ -1,28 +1,38 @@
-from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.validators import MinValueValidator
 from django.db import models
 
-User = get_user_model()
+from backend.users.models import User
 
+ORANGE = "#E26C2D"
+GREEN = "#49B64E"
+PURPLE = "#8775D2"
+
+COLORS_TAGS = [
+    (ORANGE, 'Завтрак'),
+    (GREEN, 'Обед'),
+    (PURPLE, 'Ужин')
+]
 
 class Tag(models.Model):
     name = models.CharField(
         max_length=50,
+        unique=True,
         verbose_name='Название тэга',
-        unique=True
     )
     
     color = models.CharField(
-        max_length=7,
-        verbose_name='Цвет тэга',
+        choices=COLORS_TAGS,
+        max_length=6,
+        default=ORANGE,
         unique=True,
+        verbose_name='Цвет тэга'
     )
     
     slug = models.SlugField(
         max_length=100,
-        verbose_name='Ссылка',
-        unique=True
+        unique=True,
+        verbose_name='Ссылка'
     )
     
     class Meta:

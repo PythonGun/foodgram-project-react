@@ -70,6 +70,3 @@ class Follow(models.Model):
                 name="unique_subscription",
             )
         ]
-
-        def __str__(self):
-            return f'{self.email} {self.username} {self.first_name} {self.last_name} {self.last_name}'
