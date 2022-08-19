@@ -6,7 +6,7 @@ from .validators import validate_username
 
 class User(AbstractUser):
     username = models.CharField(
-        max_length=100,
+        max_length=150,
         unique=True,
         blank=False,
         null=False,
@@ -42,7 +42,7 @@ class User(AbstractUser):
         ordering = ['-id']
 
     def __str__(self):
-        return f'{self.email} {self.first_name} {self.last_name}'
+        return f'{self.email}'
 
 
 class Follow(models.Model):

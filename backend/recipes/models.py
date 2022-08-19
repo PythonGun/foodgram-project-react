@@ -2,17 +2,18 @@ from django.core import validators
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from backend.users.models import User
+from users.models import User
 
 ORANGE = "#E26C2D"
 GREEN = "#49B64E"
 PURPLE = "#8775D2"
 
 COLORS_TAGS = [
-    (ORANGE, 'Завтрак'),
-    (GREEN, 'Обед'),
-    (PURPLE, 'Ужин')
+    (ORANGE, 'Оранжевый'),
+    (GREEN, 'Зеленый'),
+    (PURPLE, 'Фиолетовый')
 ]
+
 
 class Tag(models.Model):
     name = models.CharField(
@@ -23,7 +24,7 @@ class Tag(models.Model):
     
     color = models.CharField(
         choices=COLORS_TAGS,
-        max_length=6,
+        max_length=7,
         default=ORANGE,
         unique=True,
         verbose_name='Цвет тэга'
@@ -57,6 +58,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+
     def __str__(self) -> str:
         return f'{self.name}, {self.measurement_unit}'
 
@@ -79,7 +81,7 @@ class Recipe(models.Model):
         verbose_name='Изображение рецепта',
     )
     
-    description = models.CharField(
+    text = models.CharField(
         max_length=255,
         verbose_name='Описание рецепта',
     )

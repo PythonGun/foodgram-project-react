@@ -7,21 +7,17 @@ from .models import (Favorite, Ingredient, Recipe, RecipeIngredient, RecipeTag,
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'name', 'description', 'author', 'description', 'pub_date')
-    search_fields = (
-        'name', 'cooking_time',
-        'author__email', 'ingredients__name')
-    list_filter = ('pub_date', 'tags',)
-
-    @admin.display(description='В избранном')
-    def get_favorite_count(self, obj):
-        return obj.favorite_recipe.count()
+        'id', 'name', 'author', 'text', 'pub_date',
+    )
+    search_fields = ('name', 'cooking_time', 'author',)
+    list_filter = ('pub_date', 'tags', 'author',)
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'name', 'color', 'slug',)
+        'id', 'name', 'color', 'slug',
+    )
     search_fields = ('name', 'slug',)
     empty_value_display = '-пусто-'
 
@@ -29,7 +25,9 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'name', 'measurement_unit',)
+        'id', 'name', 'measurement_unit',
+    )
     search_fields = (
-        'name', 'measurement_unit',)
+        'name', 'measurement_unit',
+    )
     empty_value_display = '-пусто-'

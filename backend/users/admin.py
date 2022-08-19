@@ -1,12 +1,9 @@
 from django.contrib import admin
-from django.contrib.admin import register
-from django.contrib.auth.admin import UserAdmin
-
 from .models import Follow, User
 
 
-@register(User)
-class MyUserAdmin(UserAdmin):
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'username', 'email',
         'first_name', 'last_name', 'date_joined',
@@ -16,8 +13,11 @@ class MyUserAdmin(UserAdmin):
         'username', 'email', 'first_name', 'last_name',
     )
     list_filter = (
-        'email', 'first_name',
+        'email', 'first_name', 'date_joined',
     )
 
 
-admin.site.register(Follow)
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'author',)
+    search_fields = ('user', 'author',)
