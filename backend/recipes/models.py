@@ -116,7 +116,7 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
     
     def __str__(self):
-        return f'{self.author.name}, {self.name}'
+        return f'{self.name}'
 
 
 class RecipeIngredient(models.Model):
