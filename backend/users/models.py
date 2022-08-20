@@ -50,7 +50,7 @@ class Follow(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='follower',
-        verbose_name='Пользователь'
+        verbose_name='Подписчик'
     )
 
     author = models.ForeignKey(
@@ -70,3 +70,6 @@ class Follow(models.Model):
                 name="unique_subscription",
             )
         ]
+
+    def __str__(self):
+        return f'Подписка {self.user} на {self.author}'
