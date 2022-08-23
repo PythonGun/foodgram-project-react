@@ -1,7 +1,6 @@
 from django.core import validators
 from django.core.validators import MinValueValidator
 from django.db import models
-
 from users.models import User
 
 ORANGE = "#E26C2D"

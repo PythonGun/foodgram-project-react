@@ -1,21 +1,16 @@
 from django.contrib import admin
 
-from .models import (Favorite, Ingredient, Recipe, Tag, RecipeTag, RecipeIngredient)
+from .models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 
 
-# class RecipeIngredientInLine(admin.TabularInline):
-#     model = RecipeIngredient
-#     extra = 1
-#
-#
-# class RecipeTagInLine(admin.TabularInline):
-#     model = RecipeTag
-#     extra = 1
+class RecipeIngredientInLine(admin.TabularInline):
+    model = RecipeIngredient
+    extra = 1
 
-#
-@admin.register(RecipeIngredient)
-class RecipeIngredientAdmin(admin.ModelAdmin):
-    list_display = ("recipe", "ingredient", "amount")
+
+class RecipeTagInLine(admin.TabularInline):
+    model = RecipeTag
+    extra = 1
 
 
 @admin.register(Recipe)
@@ -29,7 +24,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = (
         'pub_date', 'tags', 'author',
     )
-    # inlines = (RecipeIngredientInLine, RecipeTagInLine,)
+    inlines = (RecipeIngredientInLine, RecipeTagInLine,)
 
 
 @admin.register(Tag)

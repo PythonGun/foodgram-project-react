@@ -1,7 +1,7 @@
+from api.serializers import (IngredientSerializer, RecipeSerializer,
+                             TagSerializer)
+from recipes.models import Ingredient, Recipe, Tag
 from rest_framework import generics, viewsets
-
-from api.serializers import TagSerializer, IngredientSerializer, RecipeSerializer
-from recipes.models import Tag, Ingredient, Recipe
 
 
 class TagViewSet(viewsets.ViewSet):
