@@ -116,7 +116,7 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
     
     def __str__(self):
-        return f'{self.author.name}, {self.name}'
+        return f'{self.name}'
 
 
 class RecipeIngredient(models.Model):
@@ -138,8 +138,8 @@ class RecipeIngredient(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингредиент'
-        verbose_name_plural = 'Ингредиенты'
+        verbose_name = 'Ингредиент для рецепта'
+        verbose_name_plural = 'Ингредиенты для рецепта'
         constraints = (
             models.UniqueConstraint(
                 fields=('recipe', 'ingredient'),
