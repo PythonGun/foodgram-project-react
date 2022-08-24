@@ -2,7 +2,7 @@ from django.contrib.gis.gdal.raster import source
 from django.core.validators import MinValueValidator
 from drf_base64.fields import Base64ImageField
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
-from rest_framework import serializers
+from rest_framework import exceptions, serializers
 from users.models import Follow, User
 
 
@@ -72,3 +72,72 @@ class RecipeListSerializer(serializers.ModelSerializer):
             'name', 'image', 'text',   'cooking_time',
         )
 
+
+class RecipeDetailSerializer(serializers.ModelSerializer):
+    author = CustomUserSerializer(read_only=True)
+    ingredient = CreateUpdateRecipeIngredientSerializer(many=True)
+    image = Base64ImageField()
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True
+    )
+    cooking_time = serializers.IntegerField(
+        validators=(MinValueValidator(
+            1, message='Время приготовления не может быть меньше 1 минуты.'
+        ),)
+    )
+
+    class Meta:
+        model = Recipe
+        fields = '__all__'
+
+    def validate_tags(self, data):
+        if not data:
+            raise exceptions.ValidationError(
+                'Нужно добавить хотя бы один тэг.'
+            )
+        return data
+
+    def validate_ingredients(self, data):
+        if not data:
+            raise exceptions.ValidationError(
+                'Нужно добавить хотя бы один ингредиент.'
+            )
+        ingredients = data['ingredients']
+        for ingredient in ingredients:
+            if ingredients.count(ingredient) > 1:
+                raise exceptions.ValidationError(
+                    'В списке ингредиентов имеются одинаковые значения.'
+                    'У рецепта не может быть два одинаковых ингредиента.'
+                )
+        return data
+
+    def create_recipe_ingredients(self, ingredients, recipe):
+        for ingredient in ingredients:
+            RecipeIngredient.objects.create(
+                recipe=recipe,
+                ingredient=ingredient.get("id"),
+                amount=ingredient.get("amount"),
+            )
+
+    def create(self, validated_data):
+        author = self.context.get('author').user
+        ingredients = validated_data.pop("ingredients")
+        tags = validated_data.pop("tags")
+        recipe = Recipe.objects.create(author=author, **validated_data)
+        recipe.tags.set(tags)
+        self.create_recipe_ingredients(ingredients, recipe)
+        return recipe
+
+    def update(self, obj, validated_data):
+        if "ingredients" in validated_data:
+            ingredients = validated_data.pop("ingredients")
+            obj.ingredients.clear()
+            self.create_recipe_ingredients(ingredients, obj)
+        if "tags" in validated_data:
+            tags = validated_data.pop("tags")
+            obj.tags.set(tags)
+        return super().update(obj, validated_data)
+
+    def to_representation(self, instance):
+        serializer = RecipeListSerializer(instance)
+        return serializer.data
