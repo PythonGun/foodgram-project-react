@@ -3,3 +3,4 @@ django-filter==22.1
 djangorestframework==3.13.1
 djangorestframework-simplejwt==4.8.0
 Pillow==9.2.0
+drf_base64=2.0
