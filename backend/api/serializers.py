@@ -46,7 +46,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 class CreateUpdateRecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    name = serializers.IntegerField(
+    amount = serializers.IntegerField(
         validators=(MinValueValidator(1, messages='Ингредиент не может отсутсвовать'),)
     )
 
