@@ -2,7 +2,7 @@ from api.serializers import (IngredientSerializer, RecipeDetailSerializer,
                              RecipeFavoriteOrShoppingSerializer,
                              RecipeListSerializer, TagSerializer)
 from django.shortcuts import get_object_or_404
-from recipes.models import Favorite, Ingredient, Recipe, Tag
+from recipes.models import Favorite, Ingredient, Recipe, Tag, ShoppingList
 from rest_framework import filters, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
@@ -51,6 +51,26 @@ class RecipeViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-            
 
+    @action(detail=True, methods=('post', 'delete'))
+    def shopping_cart(self, request, pk):
+        target_pk = self.kwargs.get('pk')
+        user = self.request.user
+        recipe = get_object_or_404(Recipe, pk=target_pk)
+
+        if self.request.method == 'POST':
+            ShoppingList.objects.create(user=user, recipe=recipe)
+            serializer = RecipeFavoriteOrShoppingSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        elif self.request.method == 'DELETE':
+            shopping_cart = get_object_or_404(
+                ShoppingList,
+                user=user,
+                recipe=recipe
+            )
+            shopping_cart.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         
