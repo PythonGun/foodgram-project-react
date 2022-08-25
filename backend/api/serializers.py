@@ -1,4 +1,3 @@
-from django.contrib.gis.gdal.raster import source
 from django.core.validators import MinValueValidator
 from drf_base64.fields import Base64ImageField
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
@@ -141,3 +140,9 @@ class RecipeDetailSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         serializer = RecipeListSerializer(instance)
         return serializer.data
+
+
+class RecipeFavoriteOrShoppingSerializer(serializers.ModelField):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
