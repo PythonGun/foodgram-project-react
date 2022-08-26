@@ -33,8 +33,8 @@ class User(AbstractUser):
         verbose_name='Фамилия пользователя'
     )
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username", "first_name", "last_name"]
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -61,13 +61,13 @@ class Follow(models.Model):
     )
 
     class Meta:
-        verbose_name = "Подписка"
-        verbose_name_plural = "Подписки"
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
         ordering = ['id']
         constraints = [
             models.UniqueConstraint(
-                fields=["user", "author"],
-                name="unique_subscription",
+                fields=['user', 'author'],
+                name='unique_subscription',
             )
         ]
 
