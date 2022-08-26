@@ -16,6 +16,7 @@ from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingList, Tag)
 from users.models import Follow, User
 
+from .pagination import StandardPageNumberPagination
 from .permissions import IsAuthorOrAdminPermission
 
 
@@ -36,12 +37,12 @@ class IngredientViewSet(viewsets.ViewSet):
 class RecipeViewSet(viewsets.ViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrAdminPermission,)
+    pagination_class = StandardPageNumberPagination
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return RecipeListSerializer
         return RecipeDetailSerializer
-    
 
     @action(detail=True, methods=('post', 'delete'))
     def favorite(self, request, pk=None):
@@ -103,62 +104,62 @@ class RecipeViewSet(viewsets.ViewSet):
                 f'{ingredient.measurement_unit}\n'
             )
 
-        response = HttpResponse(shopping_list, content_type="text/plain")
+        response = HttpResponse(shopping_list, content_type='text/plain')
         response['Content-Disposition'] = (
             'attachment; filename=shopping-list.txt'
         )
 
         return response
 
+class UsersViewSet(UserViewSet):
+    queryset = User.objects.all()
+    serializer_class = CustomUserSerializer
 
-    class UsersViewSet(UserViewSet):
-        queryset = User.objects.all()
-        serializer_class = CustomUserSerializer
-        @action(
-            detail=False,
-            methods=('get',),
-            permission_classes=(IsAuthenticated,)
+    @action(
+        detail=False,
+        methods=('get',),
+        permission_classes=(IsAuthenticated,)
+    )
+    def subscriptions(self, request):
+        user = self.request.user
+        queryset = Follow.objects.filter(user=user)
+        paginated_queryset = self.paginate_queryset(queryset)
+        serializer = FollowSerializer(
+            paginated_queryset, many=True, context={'request': request}
         )
-        def subscriptions(self, request):
-            user = self.request.user
-            queryset = Follow.objects.filter(user=user)
-            paginated_queryset = self.paginate_queryset(queryset)
-            serializer = FollowSerializer(
-                paginated_queryset, many=True, context={'request': request}
-            )
-            return self.get_paginated_response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
-        @action(
-            detail=True,
-            methods=('post', 'delete')
-        )
-        def subscribe(self, request, id):
-            author = get_object_or_404(User, pk=id)
+    @action(
+        detail=True,
+        methods=('post', 'delete')
+    )
+    def subscribe(self, request, id):
+        author = get_object_or_404(User, pk=id)
 
-            if request.method == 'POST':
-                if request.user.id == author.id:
-                    raise ValidationError(
-                        'Нельзя подписаться на себя'
-                    )
-                else:
-                    serializer = FollowSerializer(
-                        Follow.objects.create(user=request.user, author=author),
-                        context={'request': request},
-                    )
-                    return Response(
-                        serializer.data, status=status.HTTP_201_CREATED
-                    )
+        if request.method == 'POST':
+            if request.user.id == author.id:
+                raise ValidationError(
+                    'Нельзя подписаться на себя'
+                )
+            else:
+                serializer = FollowSerializer(
+                    Follow.objects.create(user=request.user, author=author),
+                    context={'request': request},
+                )
+                return Response(
+                    serializer.data, status=status.HTTP_201_CREATED
+                )
 
-            if request.method == 'DELETE':
-                if Follow.objects.filter(
-                        user=request.user, author=author
-                ).exists():
-                    Follow.objects.filter(
-                        user=request.user, author=author
-                    ).delete()
-                    return Response(status=status.HTTP_204_NO_CONTENT)
-                else:
-                    return Response(
-                        {'errors': 'В списке подписок нет такого автора'},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
+        if request.method == 'DELETE':
+            if Follow.objects.filter(
+                    user=request.user, author=author
+            ).exists():
+                Follow.objects.filter(
+                    user=request.user, author=author
+                ).delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response(
+                    {'errors': 'В списке подписок нет такого автора'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )

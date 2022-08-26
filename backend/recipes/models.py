@@ -4,9 +4,9 @@ from django.db import models
 
 from users.models import User
 
-ORANGE = "#E26C2D"
-GREEN = "#49B64E"
-PURPLE = "#8775D2"
+ORANGE = '#E26C2D'
+GREEN = '#49B64E'
+PURPLE = '#8775D2'
 
 COLORS_TAGS = [
     (ORANGE, 'Оранжевый'),
