@@ -16,6 +16,7 @@ from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingList, Tag)
 from users.models import Follow, User
 
+from .filters import RecipeFilter
 from .pagination import StandardPageNumberPagination
 from .permissions import IsAuthorOrAdminPermission
 
@@ -38,7 +39,8 @@ class RecipeViewSet(viewsets.ViewSet):
     queryset = Recipe.objects.all()
     permission_classes = (IsAuthorOrAdminPermission,)
     pagination_class = StandardPageNumberPagination
-
+    filter_class = RecipeFilter
+    
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return RecipeListSerializer
