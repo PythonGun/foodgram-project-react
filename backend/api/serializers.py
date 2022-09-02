@@ -1,8 +1,7 @@
 from django.core.validators import MinValueValidator
 from drf_base64.fields import Base64ImageField
-from rest_framework import exceptions, serializers
-
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
+from rest_framework import exceptions, serializers
 from users.models import Follow, User
 
 
@@ -43,27 +42,26 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RecipeIngredient
-        fields = ('id', 'name', 'measurement_unit',)
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-class CreateUpdateRecipeIngredientSerializer(serializers.ModelSerializer):
+class AddAmountIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     amount = serializers.IntegerField(
         validators=(MinValueValidator(1),)
     )
 
     class Meta:
-        model = Ingredient
+        model = RecipeIngredient
         fields = ('id', 'amount')
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
-
     author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(many=True)
     ingredients = RecipeIngredientSerializer(many=True, source='recipe')
-
     is_in_shopping_cart = serializers.BooleanField(read_only=True)
+    is_favorited = serializers.BooleanField(read_only=True)
     image = Base64ImageField()
 
     class Meta:
@@ -71,13 +69,13 @@ class RecipeListSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'tags', 'author', 'ingredients',
             'is_favorited', 'is_in_shopping_cart',
-            'name', 'image', 'text',   'cooking_time',
+            'name', 'image', 'text', 'cooking_time',
         )
 
 
 class RecipeDetailSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
-    ingredient = CreateUpdateRecipeIngredientSerializer(many=True)
+    ingredients = AddAmountIngredientSerializer(many=True)
     image = Base64ImageField()
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
