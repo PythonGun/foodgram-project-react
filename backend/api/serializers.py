@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username',  'first_name',
+            'email', 'id', 'username', 'first_name',
             'last_name', 'is_subscribed'
         )
 
@@ -84,7 +84,7 @@ class RecipeDetailSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(), many=True
     )
     image = Base64ImageField()
-    
+
     cooking_time = serializers.IntegerField(
         validators=(MinValueValidator(
             1, message='Время приготовления не может быть меньше 1 минуты.'
@@ -94,21 +94,21 @@ class RecipeDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = '__all__'
-    
+
     def validate_tags(self, data):
         if not data:
             raise exceptions.ValidationError(
                 'Нужно добавить хотя бы один тэг.'
             )
         return data
-    
+
     def validate(self, data):
         tags = data['tags']
         if not tags:
             return exceptions.ValidationError(
                 'Нужно добавить хотя бы один тэг.'
-            )                   
-    
+            )
+
         ingredients_recipe = data["ingredients"]
         ingredients_id = [item['id'] for item in ingredients_recipe]
         for ingredient in ingredients_id:
@@ -167,8 +167,8 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
-            'is_subscribed', 'recipes', 'recipes_count'
-        )
+                  'is_subscribed', 'recipes', 'recipes_count'
+                  )
 
     def get_is_subscribed(self, obj):
         return Follow.objects.filter(user=obj.user, author=obj.author).exists()

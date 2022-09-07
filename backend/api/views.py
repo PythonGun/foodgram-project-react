@@ -48,7 +48,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
         return RecipeDetailSerializer
 
     def get_queryset(self):
-        active_queryset = Recipe.objects.select_related('author').prefetch_related(
+        active_queryset = Recipe.objects.select_related(
+            'author'
+        ).prefetch_related(
             'tags',
             'ingredients',
             'recipe',
@@ -109,7 +111,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             'ingredient__name',
             'ingredient__measurement_unit'
         ).annotate(ingredient_all_amount=Sum('amount'))
-        
+
         buy_list_text = 'Список покупок с сайта Foodgram:\n\n'
         for item in ingredients_buy:
             buy_list_text += (
@@ -171,5 +173,5 @@ class UsersViewSet(UserViewSet):
             )
             followed_user.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-            
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
