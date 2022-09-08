@@ -110,11 +110,19 @@ class RecipeDetailSerializer(serializers.ModelSerializer):
             )
 
         ingredients_recipe = data["ingredients"]
+
         ingredients_id = [item['id'] for item in ingredients_recipe]
         for ingredient in ingredients_id:
             if ingredients_id.count(ingredient) > 1:
                 raise exceptions.ValidationError(
                     'У рецепта не может быть два одинаковых ингредиента.'
+                )
+
+        ingredient_amount = [item['amount'] for item in ingredients_recipe]
+        for amount in ingredient_amount:
+            if int(amount) <= 0:
+                raise exceptions.ValidationError(
+                    'Кол-во ингредиента указано 0 или меньше, так н может быть'
                 )
         return data
 
@@ -174,10 +182,21 @@ class FollowSerializer(serializers.ModelSerializer):
         return Follow.objects.filter(user=obj.user, author=obj.author).exists()
 
     def get_recipes(self, obj):
-        queryset = Recipe.objects.filter(author=obj.author).order_by(
-            '-pub_date'
-        )
-        return RecipeFavoriteOrShoppingSerializer(queryset, many=True).data
+        author_recipes = Recipe.objects.filter(author=obj.author)
+
+        if 'recipes_limit' in self.context.get('request').GET:
+            recipes_limit = self.context.get('request').GET['recipes_limit']
+            author_recipes = author_recipes[:int(recipes_limit)]
+
+        if author_recipes:
+            serializer = RecipeFavoriteOrShoppingSerializer(
+                author_recipes,
+                context={'request': self.context.get('request')},
+                many=True
+            )
+            return serializer.data
+
+        return []
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()

@@ -4,15 +4,15 @@ from django.db.models.expressions import Exists, OuterRef
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingCart, Tag)
-from rest_framework import filters, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
-from users.models import Follow, User
 
-from .filters import RecipeFilter
+from users.models import Follow, User
+from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCart, Tag)
+from .filters import RecipeFilter, IngredientFilter
 from .pagination import StandardPageNumberPagination
 from .permissions import IsAuthorOrAdminPermission
 from .serializers import (FollowSerializer, IngredientSerializer,
@@ -31,8 +31,8 @@ class TagsViewSet(viewsets.ModelViewSet):
 class IngredientsViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
+    filter_backends = (IngredientFilter,)
+    search_fields = ('^name',)
     pagination_class = None
 
 
@@ -88,7 +88,10 @@ class RecipesViewSet(viewsets.ModelViewSet):
             RecipeFavoriteOrShoppingSerializer
         )
 
-    @action(detail=True, methods=('post', 'delete'))
+    @action(
+        detail=True,
+        methods=('post', 'delete')
+    )
     def shopping_cart(self, request, pk):
         return create_delete_object(
             request,
