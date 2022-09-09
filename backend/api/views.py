@@ -4,14 +4,14 @@ from django.db.models.expressions import Exists, OuterRef
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from rest_framework import status, viewsets
+from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCart, Tag)
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
-
 from users.models import Follow, User
-from recipes.models import (FavoriteRecipe, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingCart, Tag)
+
 from .filters import RecipeFilter, IngredientFilter
 from .pagination import StandardPageNumberPagination
 from .permissions import IsAuthorOrAdminPermission
@@ -88,10 +88,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             RecipeFavoriteOrShoppingSerializer
         )
 
-    @action(
-        detail=True,
-        methods=('post', 'delete')
-    )
+    @action(detail=True, methods=('post', 'delete'))
     def shopping_cart(self, request, pk):
         return create_delete_object(
             request,

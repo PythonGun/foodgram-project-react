@@ -110,7 +110,6 @@ class RecipeDetailSerializer(serializers.ModelSerializer):
             )
 
         ingredients_recipe = data["ingredients"]
-
         ingredients_id = [item['id'] for item in ingredients_recipe]
         for ingredient in ingredients_id:
             if ingredients_id.count(ingredient) > 1:
@@ -122,7 +121,7 @@ class RecipeDetailSerializer(serializers.ModelSerializer):
         for amount in ingredient_amount:
             if int(amount) <= 0:
                 raise exceptions.ValidationError(
-                    'Кол-во ингредиента указано 0 или меньше, так н может быть'
+                    'Ошибка! Кол-во ингредиента указано 0 или меньше'
                 )
         return data
 
