@@ -8,9 +8,7 @@ services:
       - ./.env
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: denisbarinov/foodgram_backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -21,31 +19,11 @@ services:
       - ./.env
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: denisbarinov/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
       - backend
-
-#  backend:
-#    image: denisbarinov/foodgram_backend:latest
-#    restart: always
-#    volumes:
-#      - static_value:/app/static/
-#      - media_value:/app/media/
-#    depends_on:
-#      - db
-#    env_file:
-#      - ./.env
-#
-#  frontend:
-#    image: denisbarinov/foodgram_frontend:latest
-#    volumes:
-#      - ../frontend/:/app/result_build/
-#    depends_on:
-#      - backend
 
   nginx:
     image: nginx:1.19.3
