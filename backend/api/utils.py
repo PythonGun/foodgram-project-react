@@ -9,7 +9,7 @@ def create_delete_object(request, pk, model, model_serializer):
     user = request.user
     recipe = get_object_or_404(Recipe, id=pk)
 
-    if request.method == "POST":
+    if request.method == 'POST':
         model.objects.create(user=user, recipe=recipe)
         serializer = model_serializer(
             recipe,

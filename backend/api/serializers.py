@@ -110,7 +110,7 @@ class RecipeDetailSerializer(serializers.ModelSerializer):
                 'Нужно добавить хотя бы один тэг.'
             )
 
-        ingredients_recipe = data["ingredients"]
+        ingredients_recipe = data['ingredients']
         ingredients_id = [item['id'] for item in ingredients_recipe]
         for ingredient in ingredients_id:
             if ingredients_id.count(ingredient) > 1:
